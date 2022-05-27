@@ -9,30 +9,6 @@ B_pos = np.array([0,3])
 B_prime_pos = np.array([2,3])
 gamma = 0.9
 
-# 这个function在玩这个游戏的时候有用，计算state value的时候没有用
-def next_pos_and_reward(row_num, col_num, A_pos, A_prime_pos, B_pos, B_prime_pos, cur_pos):
-    if cur_pos == A_pos:
-        return A_prime_pos, 10
-    elif cur_pos == B_pos:
-        return B_prime_pos, 5
-    else:
-        random_num = random.uniform(0, 1)
-        if random_num < 0.25:
-            action = np.array([-1, 0])  # up
-        elif random_num < 0.5:
-            action = np.array([0, 1])   # right
-        elif random_num < 0.75:
-            action = np.array([1, 0])   # down
-        else:
-            action = np.array([0, -1])  # left
-        tem_pos = (cur_pos + action).tolist()
-        tem_r, tem_c = tem_pos
-        if tem_r < 0 or tem_r >= row_num or tem_c < 0 or tem_c >= col_num:
-            return cur_pos, -1
-        else:
-            return tem_pos, 0
-
-
 def transition_mat_and_reward(row_num, col_num, A_pos, A_prime_pos, B_pos, B_prime_pos):
     n = row_num*col_num
     tra_mat = np.zeros((n,n))
