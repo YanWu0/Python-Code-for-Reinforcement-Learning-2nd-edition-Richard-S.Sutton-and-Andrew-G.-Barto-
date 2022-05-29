@@ -142,3 +142,61 @@ def policy_iteration(init_policy, init_V, row_num, col_num, theta):
 print(policy_iteration(init_policy, init_V, row_num, col_num, theta))
 
 
+########################################################################################################################
+# Task 3: Value iteration
+# formula simplification
+# v(s) = max_a Sum_{s',r} p(s',r|s,a)[r + gamma* v(s')]
+#      = max_a [-1 + v(s')]
+########################################################################################################################
+
+def value_iteration(init_V, row_num, col_num, theta):
+    V = init_V
+    next_state_coll = next_state_collection(row_num, col_num)
+    delta_list = []
+    delta = theta
+    while delta >= theta:
+        delta = 0
+        for r in range(row_num):
+            for c in range(col_num):
+                if [r,c] != [0,0] and [r,c] != [row_num - 1, col_num - 1]:
+                    v_list = []
+                    D1_pos = r * col_num + c
+                    for i in range(4):
+                        x,y = next_state_coll[D1_pos][i]
+                        v_list.append(-1 + V[x,y])
+                    delta = max(delta, abs(V[r,c] - max(v_list)))
+                    V[r, c] = max(v_list)
+        delta_list.append(delta)
+    # output is a deterministic policy
+    policy = []
+    policy.append([1/4,1/4,1/4,1/4]) # board[0,0]=Door, no policy
+    for r in range(row_num):
+        for c in range(col_num):
+            if [r,c] != [0,0] and [r,c] != [row_num - 1, col_num - 1]:
+                v_list = []
+                D1_pos = r * col_num + c
+                for i in range(4):
+                    x, y = next_state_coll[D1_pos][i]
+                    v_list.append(-1 + V[x,y])
+                action = v_list.index(max(v_list))
+                p = []
+                for j in range(4):
+                    if j == action:
+                        p.append(1.0)
+                    else:
+                        p.append(0.0)
+                policy.append(p)
+    policy.append([1 / 4, 1 / 4, 1 / 4, 1 / 4])  # board[-1,-1]=Door, no policy
+    return V, policy, delta_list
+
+
+V, policy, delta_list = value_iteration(init_V, row_num, col_num, theta)
+print(V)
+print(policy)
+n = len(delta_list)
+print(n)
+
+plt.plot(range(n),delta_list,'m--')
+plt.xlabel("iter_num")
+plt.ylabel("delta")
+plt.show()
